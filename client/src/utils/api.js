@@ -1,4 +1,4 @@
-// Use a relative API base so Vite's local proxy handles backend requests.
+// Use a relative API base so Vite proxy works locally and Vercel rewrites work in production.
 const BASE = '/api';
 
 // Tokens live in localStorage for this demo so refreshes keep the user signed in.
