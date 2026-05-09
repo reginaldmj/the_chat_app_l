@@ -1,0 +1,88 @@
+/* Reset: make layout sizing predictable across browsers. */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Design tokens: later CSS uses these instead of repeating raw colors. */
+:root {
+  --page-bg: #f2f0ec;
+  --surface: #ffffff;
+  --surface-soft: #fbfaf8;
+  --border: #ece4de;
+  --text-primary: #2f2831;
+  --text-secondary: #756a72;
+  --text-muted: #a899a0;
+  --accent: #ff2b76;
+  --accent-strong: #e71968;
+  --accent-soft: #fff0f6;
+  --accent-glow: rgba(255, 43, 118, 0.26);
+  --success: #42b562;
+  --shadow-lg: 0 30px 70px rgba(44, 31, 39, 0.12);
+  --shadow-md: 0 18px 38px rgba(44, 31, 39, 0.08);
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Syne", sans-serif;
+}
+
+/* Full-height root lets app screens fill the browser. */
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button,
+input,
+textarea {
+  font-family: var(--font-body);
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Shared spinner used by loading states across checkpoints. */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mini-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e9dfd8;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* First checkpoint screen before the full shell exists. */
+.checkpoint-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.checkpoint-card {
+  width: min(520px, 100%);
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.checkpoint-card h1 {
+  font-family: var(--font-display);
+  margin-bottom: 10px;
+}
