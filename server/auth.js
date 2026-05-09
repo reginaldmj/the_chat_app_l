@@ -1,7 +1,7 @@
 // JWTs keep API requests stateless after login.
 const jwt = require('jsonwebtoken');
 
-// Defaults keep local demos runnable; real shared environments must override them so tokens are not forgeable.
+// Defaults keep local demos runnable; deployed environments must override them so tokens are not forgeable.
 const ACCESS_SECRET  = process.env.ACCESS_SECRET  || 'chat_access_secret_changeme';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'chat_refresh_secret_changeme';
 
