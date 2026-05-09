@@ -13,7 +13,8 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'http://localhost:5173',
+  'http://localhost:5174'
+  'http://localhost:5174',
   ...(process.env.CORS_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean),
 ];
 
@@ -37,6 +38,10 @@ app.use(cors({
 
 // Parse JSON request bodies for every route that follows.
 app.use(express.json());
+
+// Auth routes must mount before the 404 handler.
+app.use('/api/auth', require('./routes/authRoutes'));
+
 
 // A tiny route gives us a quick backend smoke test.
 app.get('/api/health', (req, res) => {
