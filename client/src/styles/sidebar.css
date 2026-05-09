@@ -1,0 +1,62 @@
+/* Sidebar introduces the dark navigation area used by all authenticated pages. */
+.sidebar {
+  width: 300px;
+  background: linear-gradient(180deg, #060606 0%, #121212 100%);
+  color: #fff;
+  padding: 24px 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.sidebar-hero-avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sidebar-primary-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-nav-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #f0e8ef;
+}
+
+.sidebar-nav-item.active,
+.sidebar-nav-item:hover {
+  color: var(--accent);
+  background: rgba(255, 43, 118, 0.08);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+}

@@ -1,0 +1,91 @@
+/* App shell: sidebar on the left, workspace on the right. */
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.workspace-shell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-topbar {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.workspace-search {
+  min-width: 280px;
+  background: #f6f3f0;
+  border: 1px solid #efebe7;
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+.workspace-search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.workspace-user-menu {
+  position: relative;
+}
+
+.workspace-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.workspace-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.workspace-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  padding: 8px;
+  z-index: 20;
+}
+
+.workspace-dropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.workspace-page {
+  flex: 1;
+  padding: 28px;
+  overflow: auto;
+}

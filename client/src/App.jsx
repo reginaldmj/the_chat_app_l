@@ -1,25 +1,40 @@
 import React from 'react';
-import AuthPage from './pages/AuthPage.jsx';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import Layout from './components/Layout.jsx';
 import { useAuth } from './contexts/AuthContext.jsx';
+import ActivityPage from './pages/ActivityPage.jsx';
+import AuthPage from './pages/AuthPage.jsx';
+import MembersPage from './pages/MembersPage.jsx';
+import MessagesPage from './pages/MessagesPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import StatusesPage from './pages/StatusesPage.jsx';
 
 export default function App() {
-  const { authLoading, user, logout } = useAuth();
+  const { authLoading, user } = useAuth();
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
-  if (authLoading) {
-    return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
-  }
+  React.useEffect(() => {
+    setMenuOpen(false);
+    setSearchQuery('');
+  }, [location.pathname]);
 
-  if (!user) {
-    return <AuthPage />;
-  }
+  if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
+  if (!user) return <AuthPage />;
+
+  const sharedProps = { user, searchQuery, setSearchQuery, menuOpen, setMenuOpen };
 
   return (
-    <main className="checkpoint-screen">
-      <section className="checkpoint-card">
-        <h1>Welcome, {user.displayName || user.username}</h1>
-        <p>You are signed in.</p>
-        <button type="button" onClick={logout}>Log out</button>
-      </section>
-    </main>
+    <Layout {...sharedProps}>
+      <Routes>
+        <Route path="/" element={<ActivityPage {...sharedProps} />} />
+        <Route path="/members" element={<MembersPage {...sharedProps} />} />
+        <Route path="/statuses" element={<StatusesPage {...sharedProps} />} />
+        <Route path="/messages" element={<MessagesPage {...sharedProps} />} />
+        <Route path="/profile" element={<ProfilePage {...sharedProps} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   );
 }
