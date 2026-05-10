@@ -15,6 +15,14 @@ export const clearTokens = () => {
   localStorage.removeItem('chat_refresh');
 };
 
+export const convApi = {
+  // Sidebar conversation list.
+  list: () => apiFetch('/conversations'),
+
+  // Modal create action for direct or group conversations.
+  create: (body) => apiFetch('/conversations', { method: 'POST', body: JSON.stringify(body) }),
+};
+
 let refreshingPromise = null;
 
 async function apiFetch(path, options = {}) {

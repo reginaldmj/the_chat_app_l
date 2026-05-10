@@ -61,7 +61,51 @@ function safeUser(user) {
   // API responses must never include passwordHash.
   const { passwordHash, ...safe } = user;
   return safe;
+
 }
+
+const conversations = new Map();
+
+function createConversation({ participants, name, isGroup }) {
+  const id = uuidv4();
+  const conv = {
+    id,
+    name: name || null,
+    isGroup: !!isGroup,
+    participants,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  conversations.set(id, conv);
+  return conv;
+}
+
+function getConversation(id) {
+  return conversations.get(id) || null;
+}
+
+function getConversationsForUser(userId) {
+  return [...conversations.values()].filter((conversation) => conversation.participants.includes(userId));
+}
+
+function findDirectConversation(userA, userB) {
+  // Direct conversations should be reused instead of duplicated.
+  return [...conversations.values()].find(
+    (conversation) => !conversation.isGroup
+      && conversation.participants.includes(userA)
+      && conversation.participants.includes(userB)
+  ) || null;
+}
+
+function touchConversation(id) {
+  const conversation = conversations.get(id);
+  if (conversation) {
+    conversation.updatedAt = new Date().toISOString();
+    conversations.set(id, conversation);
+  }
+}
+
+
 
 export {
   createUser,
@@ -81,4 +125,9 @@ export default {
   setUserOnline,
   safeUser,
   refreshTokens,
+  createConversation, 
+  getConversation, 
+  getConversationsForUser, 
+  findDirectConversation, 
+  touchConversation
 };

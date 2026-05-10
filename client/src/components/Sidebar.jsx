@@ -1,8 +1,16 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
+import { getConversationName } from '../hooks/useConversations.jsx';
 
-export default function Sidebar({ user }) {
+export default function Sidebar({
+  user,
+  conversations,
+  conversationsLoading,
+  activeConvId,
+  onSelectConversation,
+  onOpenModal,
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const displayName = user.displayName || user.username || 'Member';
@@ -35,6 +43,30 @@ export default function Sidebar({ user }) {
           </button>
         ))}
       </nav>
+
+      <div className="sidebar-conversations">
+        <div className="sidebar-title-row">
+          <h2>Messages</h2>
+          <button className="new-chat-btn" type="button" onClick={onOpenModal}>+</button>
+        </div>
+
+        {conversationsLoading ? <div><span className="mini-spinner"></span></div> : null}
+
+        {!conversationsLoading && conversations.length === 0 ? (
+          <div className="sidebar-empty">No conversations yet.</div>
+        ) : null}
+
+        {!conversationsLoading ? conversations.map((conversation) => (
+          <button
+            key={conversation.id}
+            className={`convo-item${activeConvId === conversation.id ? ' active' : ''}`}
+            type="button"
+            onClick={() => onSelectConversation(conversation.id)}
+          >
+            <span>{conversation.isGroup ? '#' : getConversationName(conversation, user)}</span>
+          </button>
+        )) : null}
+      </div>
     </aside>
   );
 }

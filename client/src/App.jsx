@@ -10,6 +10,9 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import StatusesPage from './pages/StatusesPage.jsx';
 import useMembers from './hooks/useMembers.jsx';
 import useStatusUpdates from './hooks/useStatusUpdates.jsx';
+import { useNavigate } from 'react-router-dom';
+import useConversations from './hooks/useConversations.jsx';
+
 
 export default function App() {
   const { authLoading, user } = useAuth();
@@ -26,21 +29,36 @@ export default function App() {
   const members = useMembers(user);
   const [statusText, setStatusText] = React.useState('');
   const statuses = useStatusUpdates(user);
+  const navigate = useNavigate();
+  const conversations = useConversations(user, navigate);
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalSearch, setModalSearch] = React.useState('');
+  const [modalSelected, setModalSelected] = React.useState([]);
+  const [modalGroupName, setModalGroupName] = React.useState('');
 
   if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
   if (!user) return <AuthPage />;
 
   const sharedProps = {
-  user,
-  searchQuery,
-  setSearchQuery,
-  menuOpen,
-  setMenuOpen,
-  members,
-  statuses,
-  statusText,
-  setStatusText,
-};
+    user,
+    searchQuery,
+    setSearchQuery,
+    menuOpen,
+    setMenuOpen, 
+    members,
+    statuses,
+    statusText,
+    setStatusText,
+    conversations,
+    showModal,
+    setShowModal,
+    modalSearch,
+    setModalSearch,
+    modalSelected,
+    setModalSelected,
+    modalGroupName,
+    setModalGroupName,
+  };
   return (
     <Layout {...sharedProps}>
       <Routes>

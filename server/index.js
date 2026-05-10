@@ -7,6 +7,8 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import convRoutes from './routes/convRoutes.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,6 +48,9 @@ app.use('/api/auth', authRoutes);
 
 // Protected user lookup powers the Members page and new chat modal.
 app.use('/api/users', userRoutes);
+
+// Conversations power the sidebar and messages page.
+app.use('/api/conversations', convRoutes);
 
 // A tiny route gives us a quick backend smoke test.
 app.get('/api/health', (req, res) => {
