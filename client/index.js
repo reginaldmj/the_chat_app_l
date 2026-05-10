@@ -1,13 +1,11 @@
 // Load .env values before any code reads process.env.
-import dotenv from 'dotenv';
-dotenv.config();
+require('dotenv').config();
 
 // Express handles HTTP routes; CORS allows the Vite dev server to call the API.
-import express from 'express';
-import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+const express = require('express');
+const cors = require('cors');
 
+// Create one app instance for the local API server.
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -42,10 +40,17 @@ app.use(cors({
 app.use(express.json());
 
 // Auth routes must mount before the 404 handler.
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', require('./routes/authRoutes'));
 
 // Protected user lookup powers the Members page and new chat modal.
-app.use('/api/users', userRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
+
+// export const userApi = {
+//   // List everyone except the current user.
+//   list: () => apiFetch('/users'),
+//   get: (id) => apiFetch(`/users/${id}`),
+// };
+
 
 // A tiny route gives us a quick backend smoke test.
 app.get('/api/health', (req, res) => {
@@ -64,10 +69,10 @@ app.use((err, req, res, next) => {
 });
 
 // Start the local API when this file is run directly.
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`chat server running on http://localhost:${PORT}`);
   });
 }
 
-export default app;
+module.exports = app;

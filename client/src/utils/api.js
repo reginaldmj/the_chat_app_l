@@ -74,6 +74,12 @@ async function refreshAccessToken() {
   }
 }
 
+export const userApi = {
+  // List everyone except the current user.
+  list: () => apiFetch('/users'),
+  get: (id) => apiFetch(`/users/${id}`),
+};
+
 export const authApi = {
   register: (body) => apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => apiFetch('/auth/login', { method: 'POST', body: JSON.stringify(body) }),

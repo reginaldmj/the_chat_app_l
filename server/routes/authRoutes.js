@@ -1,7 +1,7 @@
-const express = require('express');
-const bcrypt  = require('bcryptjs');
-const db      = require('../db');
-const { signAccess, signRefresh, verifyRefresh, requireAuth } = require('../auth');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import db from '../db.js';
+import { signAccess, signRefresh, verifyRefresh, requireAuth } from '../auth.js';
 
 const router = express.Router();
 
@@ -84,4 +84,6 @@ router.get('/me', requireAuth, (req, res) => {
   res.json(db.safeUser(user));
 });
 
-module.exports = router;
+export default router;
+
+

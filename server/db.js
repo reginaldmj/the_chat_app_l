@@ -1,6 +1,6 @@
 // UUIDs make user ids unique without needing a database sequence.
-const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcryptjs');
+import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
 
 // Demo storage is process-local; data and token revocation do not survive restarts or scale across instances.
 const users = new Map();
@@ -63,7 +63,17 @@ function safeUser(user) {
   return safe;
 }
 
-module.exports = {
+export {
+  createUser,
+  findUserByEmail,
+  findUserById,
+  getAllUsers,
+  setUserOnline,
+  safeUser,
+  refreshTokens,
+};
+
+export default {
   createUser,
   findUserByEmail,
   findUserById,

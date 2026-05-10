@@ -1,41 +1,105 @@
-/* App shell: sidebar on the left, workspace on the right. */
+.members-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.member-card,
+.status-empty {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.member-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.member-card p {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.member-card span {
+  display: inline-flex;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border: 1px solid #ffd0df;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-empty {
+  padding: 28px;
+  text-align: center;
+}
+
+/* App layout */
 .app {
   display: flex;
   min-height: 100vh;
-  background: var(--surface);
 }
 
 .workspace-shell {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
+.workspace-page {
+  flex: 1;
+  padding: 24px;
+  background: var(--page-bg);
+}
+
+/* TopBar styles */
 .workspace-topbar {
-  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 10px 18px;
+  padding: 16px 24px;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.96);
+  flex-shrink: 0;
 }
 
 .workspace-search {
-  min-width: 280px;
-  background: #f6f3f0;
-  border: 1px solid #efebe7;
-  border-radius: 999px;
-  padding: 10px 14px;
+  flex: 1;
+  max-width: 400px;
 }
 
 .workspace-search input {
   width: 100%;
-  border: none;
-  background: transparent;
-  outline: none;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--text-primary);
 }
 
 .workspace-user-menu {
@@ -43,49 +107,77 @@
 }
 
 .workspace-user-chip {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 8px 6px 14px;
-  background: var(--surface);
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface-soft);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  font-weight: 700;
 }
 
 .workspace-user-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
+  font-weight: 700;
+  font-size: 12px;
 }
 
 .workspace-dropdown {
   position: absolute;
+  top: 100%;
   right: 0;
-  top: calc(100% + 10px);
-  min-width: 180px;
+  margin-top: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow-md);
-  padding: 8px;
-  z-index: 20;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  min-width: 160px;
+  z-index: 10;
 }
 
 .workspace-dropdown button {
-  display: block;
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
 }
 
-.workspace-page {
-  flex: 1;
-  padding: 28px;
-  overflow: auto;
+.workspace-dropdown button:hover {
+  background: var(--surface-soft);
+}
+
+.workspace-dropdown button:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.workspace-dropdown button:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Activity page */
+.activity-page {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.activity-page h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.activity-page p {
+  color: var(--text-secondary);
 }

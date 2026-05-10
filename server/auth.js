@@ -1,5 +1,5 @@
 // JWTs keep API requests stateless after login.
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // Defaults keep local demos runnable; deployed environments must override them so tokens are not forgeable.
 const ACCESS_SECRET  = process.env.ACCESS_SECRET  || 'chat_access_secret_changeme';
@@ -30,4 +30,4 @@ function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { signAccess, signRefresh, verifyAccess, verifyRefresh, requireAuth };
+export { signAccess, signRefresh, verifyAccess, verifyRefresh, requireAuth };

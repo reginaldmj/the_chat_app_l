@@ -8,6 +8,7 @@ import MembersPage from './pages/MembersPage.jsx';
 import MessagesPage from './pages/MessagesPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import StatusesPage from './pages/StatusesPage.jsx';
+import useMembers from './hooks/useMembers.jsx';
 
 export default function App() {
   const { authLoading, user } = useAuth();
@@ -20,11 +21,13 @@ export default function App() {
     setSearchQuery('');
   }, [location.pathname]);
 
+  // Call useMembers always to avoid conditional hook calls
+  const members = useMembers(user);
+
   if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
   if (!user) return <AuthPage />;
 
-  const sharedProps = { user, searchQuery, setSearchQuery, menuOpen, setMenuOpen };
-
+  const sharedProps = { user, searchQuery, setSearchQuery, menuOpen, setMenuOpen, members };
   return (
     <Layout {...sharedProps}>
       <Routes>
