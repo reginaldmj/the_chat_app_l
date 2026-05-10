@@ -181,3 +181,49 @@
 .activity-page p {
   color: var(--text-secondary);
 }
+
+.home-page,
+.status-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-card,
+.status-post {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  padding: 18px;
+}
+
+.status-input {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-soft);
+  padding: 14px;
+  resize: vertical;
+  outline: none;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-save-btn {
+  min-width: 140px;
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+}
