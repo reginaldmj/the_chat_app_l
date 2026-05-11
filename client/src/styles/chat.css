@@ -81,3 +81,51 @@
   color: #fff;
   font-weight: 700;
 }
+
+.attachment-input {
+  display: none;
+}
+
+.pending-attachment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.attachment-card {
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.msg-bubble.theirs .attachment-card {
+  border-color: var(--border);
+  background: var(--surface-soft);
+}
+
+.attachment-preview {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.attachment-copy {
+  padding: 10px;
+}
+
+.attachment-copy strong,
+.attachment-copy span {
+  display: block;
+}
+
+.attachment-copy a {
+  color: var(--accent);
+  font-weight: 700;
+}

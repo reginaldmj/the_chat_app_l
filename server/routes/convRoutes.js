@@ -130,4 +130,21 @@ function formatTime(iso) {
   return date.toLocaleDateString('en-US', { weekday: 'short' });
 }
 
+const { text, attachment } = req.body;
+const trimmedText = typeof text === 'string' ? text.trim() : '';
+
+// Inline attachments keep the demo self-contained; production should validate size/type and store bytes externally.
+const normalizedAttachment = attachment && typeof attachment === 'object'
+  ? {
+      name: attachment.name || 'Attachment',
+      type: attachment.type || 'application/octet-stream',
+      size: Number(attachment.size) || 0,
+      dataUrl: attachment.dataUrl || '',
+    }
+  : null;
+
+if (!trimmedText && !normalizedAttachment) {
+  return res.status(400).json({ error: 'text or attachment is required' });
+}
+
 export default router;
