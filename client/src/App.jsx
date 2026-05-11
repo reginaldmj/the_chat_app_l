@@ -35,6 +35,7 @@ export default function App() {
   const [modalSearch, setModalSearch] = React.useState('');
   const [modalSelected, setModalSelected] = React.useState([]);
   const [modalGroupName, setModalGroupName] = React.useState('');
+  const [messageText, setMessageText] = React.useState('');
 
   if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
   if (!user) return <AuthPage />;
@@ -44,7 +45,7 @@ export default function App() {
     searchQuery,
     setSearchQuery,
     menuOpen,
-    setMenuOpen, 
+    setMenuOpen,
     members,
     statuses,
     statusText,
@@ -58,6 +59,8 @@ export default function App() {
     setModalSelected,
     modalGroupName,
     setModalGroupName,
+    messageText,
+    setMessageText,
   };
   return (
     <Layout {...sharedProps}>

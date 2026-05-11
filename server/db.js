@@ -105,6 +105,42 @@ function touchConversation(id) {
   }
 }
 
+const messages = new Map();
+
+function addMessage({ conversationId, senderId, text, attachment = null }) {
+  if (!messages.has(conversationId)) messages.set(conversationId, []);
+
+  const msg = {
+    id: uuidv4(),
+    conversationId,
+    senderId,
+    text,
+    attachment,
+    createdAt: new Date().toISOString(),
+    read: false,
+  };
+
+  messages.get(conversationId).push(msg);
+  touchConversation(conversationId);
+  return msg;
+}
+
+function getMessages(conversationId, limit = 50) {
+  const all = messages.get(conversationId) || [];
+  return all.slice(-limit);
+}
+
+function markRead(conversationId, userId) {
+  const convoMessages = messages.get(conversationId) || [];
+  convoMessages.forEach((message) => {
+    if (message.senderId !== userId) message.read = true;
+  });
+}
+
+function unreadCount(conversationId, userId) {
+  const convoMessages = messages.get(conversationId) || [];
+  return convoMessages.filter((message) => message.senderId !== userId && !message.read).length;
+}
 
 
 export {
@@ -115,6 +151,9 @@ export {
   setUserOnline,
   safeUser,
   refreshTokens,
+  addMessage,
+  getMessages,
+  markRead,
 };
 
 export default {
@@ -129,5 +168,8 @@ export default {
   getConversation, 
   getConversationsForUser, 
   findDirectConversation, 
-  touchConversation
+  touchConversation,
+  addMessage,
+  getMessages,
+  markRead,
 };

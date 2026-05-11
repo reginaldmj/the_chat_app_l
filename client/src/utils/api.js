@@ -15,14 +15,6 @@ export const clearTokens = () => {
   localStorage.removeItem('chat_refresh');
 };
 
-export const convApi = {
-  // Sidebar conversation list.
-  list: () => apiFetch('/conversations'),
-
-  // Modal create action for direct or group conversations.
-  create: (body) => apiFetch('/conversations', { method: 'POST', body: JSON.stringify(body) }),
-};
-
 let refreshingPromise = null;
 
 async function apiFetch(path, options = {}) {
@@ -93,4 +85,21 @@ export const authApi = {
   login: (body) => apiFetch('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   logout: () => apiFetch('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken: getRefreshToken() }) }),
   me: () => apiFetch('/auth/me'),
+};
+
+export const convApi = {
+  // Sidebar conversation list.
+  list: () => apiFetch('/conversations'),
+
+  // Create direct or group conversations from the modal.
+  create: (body) => apiFetch('/conversations', { method: 'POST', body: JSON.stringify(body) }),
+
+  // Opening messages also marks the conversation read on the server.
+  messages: (id) => apiFetch(`/conversations/${id}/messages`),
+
+  // A message can later include text, attachment, or both.
+  sendMessage: (id, payload) => apiFetch(`/conversations/${id}/messages`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
 };

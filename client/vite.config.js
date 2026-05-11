@@ -9,5 +9,10 @@ export default defineConfig({
       // This makes frontend fetch('/api/...') work without hardcoding localhost:3001.
       '/api': 'http://localhost:3001',
     },
+    hmr: {
+      // Use polling instead of WebSocket to avoid connection issues in WSL.
+      port: false,
+      protocol: 'http',
+    },
   },
 });
