@@ -5,8 +5,8 @@ export default (req, res) => {
   const originalUrl = req.url || '';
   const pathname = originalUrl.split('?')[0];
 
-  if (pathname === '/api' && originalUrl.includes('path=')) {
-    // Vercel may invoke this as /api?path=...; normalize it so Express sees local-dev routes.
+  if ((pathname === '/api' || pathname === '/api/index.js') && originalUrl.includes('path=')) {
+    // Vercel may invoke this with path query params; normalize it so Express sees local-dev routes.
     const url = new URL(originalUrl, `http://${req.headers.host || 'localhost'}`);
     const path = url.searchParams.getAll('path').join('/');
 
