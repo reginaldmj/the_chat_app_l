@@ -227,3 +227,50 @@
   background: var(--accent);
   color: #fff;
 }
+
+/* Profile editing layout. */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 720px;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-form input {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.profile-delete-btn {
+  min-width: 140px;
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-weight: 700;
+  background: #fff7f7;
+  border: 1px solid #f2caca;
+  color: #c25050;
+}

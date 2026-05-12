@@ -13,6 +13,24 @@ router.get('/', (req, res) => {
   res.json(all);
 });
 
+// More specific routes must come before less specific patterns like /:id
+router.patch('/me', (req, res) => {
+  try {
+    const { displayName, role, username, email, avatarUrl } = req.body;
+    const updatedUser = db.updateUser(req.user.id, { displayName, role, username, email, avatarUrl });
+    if (!updatedUser) return res.status(404).json({ error: 'Not found' });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.delete('/me', (req, res) => {
+  const deleted = db.deleteUser(req.user.id);
+  if (!deleted) return res.status(404).json({ error: 'Not found' });
+  res.json({ message: 'User deleted' });
+});
+
 router.get('/:id', (req, res) => {
   const user = db.findUserById(req.params.id);
   if (!user) return res.status(404).json({ error: 'Not found' });

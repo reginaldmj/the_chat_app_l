@@ -75,9 +75,10 @@ async function refreshAccessToken() {
 }
 
 export const userApi = {
-  // List everyone except the current user.
   list: () => apiFetch('/users'),
   get: (id) => apiFetch(`/users/${id}`),
+  updateMe: (body) => apiFetch('/users/me', { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteMe: () => apiFetch('/users/me', { method: 'DELETE' }),
 };
 
 export const authApi = {

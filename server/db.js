@@ -142,6 +142,43 @@ function unreadCount(conversationId, userId) {
   return convoMessages.filter((message) => message.senderId !== userId && !message.read).length;
 }
 
+function updateUser(id, updates = {}) {
+  const user = users.get(id);
+  if (!user) return null;
+
+  if (updates.email && [...users.values()].some((entry) => entry.id !== id && entry.email === updates.email)) {
+    throw new Error('Email already registered');
+  }
+
+  if (updates.username && [...users.values()].some((entry) => entry.id !== id && entry.username === updates.username)) {
+    throw new Error('Username already taken');
+  }
+
+  const nextUser = {
+    ...user,
+    ...Object.fromEntries(
+      // Empty strings mean "leave unchanged"; explicit clears would need a separate nullable path.
+      Object.entries({
+        username: updates.username,
+        email: updates.email,
+        displayName: updates.displayName,
+        role: updates.role,
+        avatarUrl: updates.avatarUrl,
+      }).filter(([, value]) => typeof value === 'string' && value.trim())
+    ),
+  };
+
+  users.set(id, nextUser);
+  return safeUser(nextUser);
+}
+
+function deleteUser(id) {
+  const user = users.get(id);
+  if (!user) return false;
+  users.delete(id);
+  return true;
+}
+
 
 export {
   createUser,
@@ -154,6 +191,8 @@ export {
   addMessage,
   getMessages,
   markRead,
+  updateUser,
+  deleteUser,
 };
 
 export default {
@@ -172,4 +211,6 @@ export default {
   addMessage,
   getMessages,
   markRead,
+  updateUser,
+  deleteUser,
 };

@@ -36,6 +36,25 @@ export default function App() {
   const [modalSelected, setModalSelected] = React.useState([]);
   const [modalGroupName, setModalGroupName] = React.useState('');
   const [messageText, setMessageText] = React.useState('');
+  const [profileForm, setProfileForm] = React.useState({
+    displayName: '',
+    username: '',
+    email: '',
+    role: '',
+    avatarUrl: '',
+  });
+
+  React.useEffect(() => {
+    if (user) {
+      setProfileForm({
+        displayName: user.displayName || '',
+        username: user.username || '',
+        email: user.email || '',
+        role: user.role || '',
+        avatarUrl: user.avatarUrl || '',
+      });
+    }
+  }, [user]);
 
   if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
   if (!user) return <AuthPage />;
@@ -61,6 +80,8 @@ export default function App() {
     setModalGroupName,
     messageText,
     setMessageText,
+    profileForm,
+    setProfileForm,
   };
   return (
     <Layout {...sharedProps}>
