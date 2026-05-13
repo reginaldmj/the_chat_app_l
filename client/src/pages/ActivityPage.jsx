@@ -12,6 +12,12 @@ export default function ActivityPage({ user, searchQuery, statuses, statusText, 
 
   return (
     <section className="home-page">
+      <header className="page-heading">
+        <h1>Home</h1>
+        <span>Home</span>
+        <p>Post a status update and keep up with your personal home feed.</p>
+      </header>
+
       <section className="status-card">
         <div className="status-card-head">
           <div className="status-avatar" style={{ background: user.color || '#444' }}>
@@ -45,6 +51,11 @@ export default function ActivityPage({ user, searchQuery, statuses, statusText, 
           </button>
         </div>
       </section>
+
+      <header className="feed-heading">
+        <h2>Latest updates</h2>
+        <p>Recent status posts from your workspace.</p>
+      </header>
 
       <section className="status-feed">
         {filteredUpdates.length === 0 ? (

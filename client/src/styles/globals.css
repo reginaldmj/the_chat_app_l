@@ -7,10 +7,10 @@
 
 /* Design tokens: later CSS uses these instead of repeating raw colors. */
 :root {
-  --page-bg: #f2f0ec;
+  --page-bg: #ffffff;
   --surface: #ffffff;
-  --surface-soft: #fbfaf8;
-  --border: #ece4de;
+  --surface-soft: #f8f5f2;
+  --border: #ece3dc;
   --text-primary: #2f2831;
   --text-secondary: #756a72;
   --text-muted: #a899a0;
@@ -21,13 +21,17 @@
   --success: #42b562;
   --shadow-lg: 0 30px 70px rgba(44, 31, 39, 0.12);
   --shadow-md: 0 18px 38px rgba(44, 31, 39, 0.08);
-  --font-body: "Plus Jakarta Sans", sans-serif;
-  --font-display: "Syne", sans-serif;
+  --font-body: "Patrick Hand", "Segoe Print", "Bradley Hand ITC", "Comic Sans MS", cursive;
+  --font-display: "Gloria Hallelujah", "Patrick Hand", "Segoe Print", cursive;
 }
 
 /* Full-height root lets app screens fill the browser. */
 html, body, #root {
   min-height: 100%;
+}
+
+#root {
+  isolation: isolate;
 }
 
 body {
@@ -42,12 +46,47 @@ button,
 input,
 textarea {
   font-family: var(--font-body);
+  font-size: inherit;
 }
 
 button {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.workspace-page,
+.auth-shell,
+.checkpoint-screen {
+  position: relative;
+}
+
+.workspace-page::before,
+.auth-shell::before,
+.checkpoint-screen::before {
+  content: "RMJ";
+  position: fixed;
+  right: clamp(24px, 7vw, 120px);
+  bottom: clamp(18px, 7vh, 86px);
+  z-index: 0;
+  color: rgba(255, 43, 118, 0.075);
+  font-family: var(--font-display);
+  font-size: 150px;
+  line-height: 1;
+  pointer-events: none;
+  transform: rotate(-10deg);
+  user-select: none;
+}
+
+.workspace-page > *,
+.auth-panel,
+.checkpoint-card {
+  position: relative;
+  z-index: 1;
 }
 
 /* Shared spinner used by loading states across checkpoints. */
@@ -85,4 +124,22 @@ button {
 .checkpoint-card h1 {
   font-family: var(--font-display);
   margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+  .workspace-page::before,
+  .auth-shell::before,
+  .checkpoint-screen::before {
+    font-size: 108px;
+  }
+}
+
+@media (max-width: 640px) {
+  .workspace-page::before,
+  .auth-shell::before,
+  .checkpoint-screen::before {
+    right: 18px;
+    bottom: 24px;
+    font-size: 82px;
+  }
 }

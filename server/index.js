@@ -20,25 +20,54 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   ...(process.env.CORS_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean),
-];
+].map((origin) => origin.replace(/\/$/, ''));
 
-app.use(cors({
-  origin(origin, callback) {
-    // Browserless tools like curl send no origin, so allow them for local testing.
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
+function isSameHostOrigin(origin, host) {
+  if (!origin || !host) return false;
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
+  try {
+    return new URL(origin).host === String(host).trim();
+  } catch {
+    return false;
+  }
+}
 
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+function getForwardedHosts(req) {
+  return [
+    req.headers.host,
+    req.headers['x-forwarded-host'],
+  ]
+    .filter(Boolean)
+    .flatMap((value) => String(value).split(','))
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+app.use((req, res, next) => {
+  cors({
+    origin(origin, callback) {
+      // Browserless tools like curl send no origin, so allow them for local testing.
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const isSameOriginRequest = getForwardedHosts(req)
+        .some((host) => isSameHostOrigin(normalizedOrigin, host));
+
+      if (allowedOrigins.includes(normalizedOrigin) || isSameOriginRequest) {
+        callback(null, true);
+        return;
+      }
+
+      const error = new Error('Not allowed by CORS');
+      error.status = 403;
+      callback(error);
+    },
+    credentials: true,
+  })(req, res, next);
+});
 
 // Parse JSON request bodies for every route that follows.
 app.use(express.json());
@@ -64,8 +93,15 @@ app.use((req, res) => {
 
 // Keep unexpected errors from leaking stack traces to the browser.
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  const status = err.status || err.statusCode || 500;
+  const message = status === 403
+    ? 'Origin not allowed'
+    : status >= 500
+      ? 'Internal server error'
+      : err.message || 'Request failed';
+
+  if (status >= 500) console.error(err);
+  res.status(status).json({ error: message });
 });
 
 // Start the local API when this file is run directly.

@@ -31,7 +31,7 @@ export default function ConversationModal({
       <div className="modal">
         <div className="modal-header">
           <h2>New Conversation</h2>
-          <button type="button" onClick={onClose}>x</button>
+          <button className="modal-close-btn" type="button" onClick={onClose} aria-label="Close new conversation dialog">&times;</button>
         </div>
 
         <div className="modal-search">
@@ -46,6 +46,14 @@ export default function ConversationModal({
 
         <div className="modal-user-list">
           {modalLoading ? <div><span className="mini-spinner"></span></div> : null}
+
+          {!modalLoading && filteredUsers.length === 0 ? (
+            <div className="modal-empty-state">
+              <strong>{modalSearch.trim() ? 'No users match your search' : 'No other users registered yet'}</strong>
+              <p>{modalSearch.trim() ? 'Try searching by display name or username.' : 'Invite your friends, family or colleagues to join chat'}</p>
+            </div>
+          ) : null}
+
           {filteredUsers.map((user) => {
             const selected = modalSelected.includes(user.id);
             return (
