@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cd client && npm run dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
     "build": "cd client && npm install && npm run build",
     "vercel-build": "npm run build",
     "preview": "cd client && npm run preview",

@@ -7,7 +7,7 @@
   background: var(--surface);
 }
 
-.workspace-shell {
+.app-shell {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -15,7 +15,7 @@
   background: var(--surface);
 }
 
-.workspace-page {
+.app-page {
   flex: 1;
   overflow-y: auto;
   padding: clamp(18px, 2.5vh, 28px) clamp(18px, 2vw, 32px) 42px clamp(18px, 2vw, 30px);
@@ -24,21 +24,21 @@
   scrollbar-width: thin;
 }
 
-.workspace-page::-webkit-scrollbar {
+.app-page::-webkit-scrollbar {
   width: 10px;
 }
 
-.workspace-page::-webkit-scrollbar-track {
+.app-page::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.workspace-page::-webkit-scrollbar-thumb {
+.app-page::-webkit-scrollbar-thumb {
   background: rgba(117, 100, 90, 0.35);
   border-radius: 999px;
 }
 
 /* TopBar styles */
-.workspace-topbar {
+.app-topbar {
   min-height: 76px;
   display: flex;
   align-items: center;
@@ -50,14 +50,14 @@
   flex-shrink: 0;
 }
 
-.workspace-search {
+.app-search {
   position: relative;
   width: min(32vw, 380px);
   min-width: 210px;
   margin-left: auto;
 }
 
-.workspace-search::before {
+.app-search::before {
   content: "";
   position: absolute;
   left: 23px;
@@ -70,7 +70,7 @@
   pointer-events: none;
 }
 
-.workspace-search::after {
+.app-search::after {
   content: "";
   position: absolute;
   left: 35px;
@@ -83,7 +83,7 @@
   pointer-events: none;
 }
 
-.workspace-search input {
+.app-search input {
   width: 100%;
   height: 44px;
   padding: 0 18px 0 52px;
@@ -95,21 +95,21 @@
   font-size: 15px;
 }
 
-.workspace-search input::placeholder {
+.app-search input::placeholder {
   color: #756e73;
 }
 
-.workspace-search input:focus {
+.app-search input:focus {
   border-color: #ead0d9;
   box-shadow: 0 0 0 4px rgba(255, 43, 118, 0.08);
 }
 
-.workspace-user-menu {
+.app-user-menu {
   position: relative;
   flex: 0 0 auto;
 }
 
-.workspace-user-chip {
+.app-user-chip {
   min-width: 148px;
   height: 52px;
   display: flex;
@@ -125,7 +125,7 @@
   font-weight: 700;
 }
 
-.workspace-user-avatar {
+.app-user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -139,7 +139,7 @@
   flex-shrink: 0;
 }
 
-.workspace-dropdown {
+.app-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -152,14 +152,14 @@
   box-shadow: var(--shadow-lg);
 }
 
-.workspace-dropdown button {
+.app-dropdown button {
   width: 100%;
   padding: 12px 16px;
   text-align: left;
   color: var(--text-primary);
 }
 
-.workspace-dropdown button:hover {
+.app-dropdown button:hover {
   background: var(--surface-soft);
 }
 
@@ -387,6 +387,21 @@
   gap: 12px;
   padding: 15px;
   border-radius: 18px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.member-card:hover,
+.member-card:focus-visible {
+  border-color: #f3b8ca;
+  box-shadow: 0 24px 48px rgba(79, 57, 67, 0.12);
+  transform: translateY(-1px);
+}
+
+.member-card:focus-visible {
+  outline: 3px solid rgba(255, 43, 118, 0.24);
+  outline-offset: 2px;
 }
 
 .member-avatar {
@@ -441,7 +456,15 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  width: 100%;
   max-width: 1180px;
+}
+
+.public-profile-page {
+  min-height: 100vh;
+  justify-content: center;
+  margin: 0 auto;
+  padding: clamp(18px, 4vw, 42px);
 }
 
 .profile-hero {
@@ -717,7 +740,7 @@
 }
 
 @media (max-width: 1180px) {
-  .workspace-search {
+  .app-search {
     width: min(38vw, 340px);
   }
 
@@ -734,16 +757,16 @@
     overflow: visible;
   }
 
-  .workspace-shell {
+  .app-shell {
     min-height: 0;
   }
 
-  .workspace-topbar {
+  .app-topbar {
     min-height: 70px;
     align-items: stretch;
   }
 
-  .workspace-search {
+  .app-search {
     width: 100%;
     min-width: 0;
   }
@@ -770,7 +793,7 @@
     font-size: 27px;
   }
 
-  .workspace-page {
+  .app-page {
     overflow: visible;
     padding: 20px 16px 34px;
   }
@@ -781,18 +804,18 @@
 }
 
 @media (max-width: 640px) {
-  .workspace-topbar {
+  .app-topbar {
     flex-wrap: wrap;
     gap: 10px;
   }
 
-  .workspace-user-chip {
+  .app-user-chip {
     width: 100%;
     min-width: 0;
     height: 50px;
   }
 
-  .workspace-search input {
+  .app-search input {
     height: 46px;
     font-size: 15px;
   }

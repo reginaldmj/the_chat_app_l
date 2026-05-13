@@ -17,12 +17,14 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    const user = await db.createUser({ username, email, password, displayName, role });
+    let user = await db.createUser({ username, email, password, displayName, role });
+    db.setUserOnline(user.id, true);
+    user = db.safeUser(db.findUserById(user.id));
     const accessToken  = signAccess({ id: user.id, username: user.username });
     const refreshToken = signRefresh({ id: user.id });
 
-    // The allowlist lets logout revoke refresh tokens in this in-memory demo.
-    db.refreshTokens.add(refreshToken);
+    // The allowlist lets logout revoke refresh tokens.
+    db.addRefreshToken(refreshToken);
     res.status(201).json({ user, accessToken, refreshToken });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -46,7 +48,7 @@ router.post('/login', async (req, res) => {
     const safe = db.safeUser(user);
     const accessToken  = signAccess({ id: safe.id, username: safe.username });
     const refreshToken = signRefresh({ id: safe.id });
-    db.refreshTokens.add(refreshToken);
+    db.addRefreshToken(refreshToken);
     res.json({ user: safe, accessToken, refreshToken });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -55,7 +57,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/refresh', (req, res) => {
   const { refreshToken } = req.body;
-  if (!refreshToken || !db.refreshTokens.has(refreshToken)) {
+  if (!refreshToken || !db.hasRefreshToken(refreshToken)) {
     return res.status(401).json({ error: 'Invalid refresh token' });
   }
 
@@ -65,7 +67,7 @@ router.post('/refresh', (req, res) => {
     const accessToken = signAccess({ id: payload.id, username: payload.username });
     res.json({ accessToken });
   } catch {
-    db.refreshTokens.delete(refreshToken);
+    db.deleteRefreshToken(refreshToken);
     res.status(401).json({ error: 'Refresh token expired' });
   }
 });
@@ -73,7 +75,7 @@ router.post('/refresh', (req, res) => {
 router.post('/logout', requireAuth, (req, res) => {
   // The client sends the refresh token so logout can revoke it.
   const { refreshToken } = req.body;
-  db.refreshTokens.delete(refreshToken);
+  db.deleteRefreshToken(refreshToken);
   db.setUserOnline(req.user.id, false);
   res.json({ message: 'Logged out' });
 });

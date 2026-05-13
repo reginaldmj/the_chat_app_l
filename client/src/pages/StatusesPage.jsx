@@ -14,7 +14,7 @@ export default function StatusesPage({ searchQuery, statuses }) {
   return (
     <section className="home-page">
       <h1>All statuses</h1>
-      <p>{filteredUpdates.length} post{filteredUpdates.length === 1 ? '' : 's'} in your workspace.</p>
+      <p>{filteredUpdates.length} post{filteredUpdates.length === 1 ? '' : 's'} in your team.</p>
 
       {filteredUpdates.length === 0 ? (
         <div className="status-empty">

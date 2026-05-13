@@ -12,6 +12,7 @@ export default function Layout({
   setSearchQuery,
   menuOpen,
   setMenuOpen,
+  members,
   conversations,
   showModal,
   setShowModal,
@@ -35,8 +36,8 @@ export default function Layout({
     setModalSearch('');
     setModalSelected([]);
     setModalGroupName('');
-    await conversations.openConversationModal();
-  }, [conversations, setModalGroupName, setModalSearch, setModalSelected, setShowModal]);
+    await conversations.openConversationModal(members?.members || []);
+  }, [conversations, members, setModalGroupName, setModalSearch, setModalSelected, setShowModal]);
 
   const handleCloseModal = React.useCallback(() => {
     setShowModal(false);
@@ -66,7 +67,7 @@ export default function Layout({
         onSelectConversation={conversations.selectConversation}
         onOpenModal={handleOpenModal}
       />
-      <section className="workspace-shell">
+      <section className="app-shell">
         <TopBar
           user={user}
           searchQuery={searchQuery}
@@ -75,7 +76,7 @@ export default function Layout({
           setMenuOpen={setMenuOpen}
           onLogout={handleLogout}
         />
-        <main className="workspace-page">
+        <main className="app-page">
           {children}
         </main>
       </section>
@@ -83,6 +84,7 @@ export default function Layout({
         open={showModal}
         modalUsers={conversations.modalUsers}
         modalLoading={conversations.modalLoading}
+        modalError={conversations.modalError}
         modalSearch={modalSearch}
         setModalSearch={setModalSearch}
         modalSelected={modalSelected}

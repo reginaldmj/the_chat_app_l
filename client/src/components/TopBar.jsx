@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 
 function getSearchPlaceholder(pathname) {
-  if (pathname === '/profile') return 'Search profile settings';
+  if (pathname.startsWith('/profile')) return 'Search profile settings';
   if (pathname === '/members') return 'Search members';
   if (pathname === '/messages') return 'Search messages';
   return 'Search status updates';
@@ -28,8 +28,8 @@ export default function TopBar({ user, searchQuery, setSearchQuery, menuOpen, se
   }, [menuOpen, setMenuOpen]);
 
   return (
-    <header className="workspace-topbar">
-      <label className="workspace-search">
+    <header className="app-topbar">
+      <label className="app-search">
         <input
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
@@ -37,16 +37,16 @@ export default function TopBar({ user, searchQuery, setSearchQuery, menuOpen, se
         />
       </label>
 
-      <div className="workspace-user-menu" ref={menuRef}>
-        <button className="workspace-user-chip" type="button" onClick={() => setMenuOpen((current) => !current)}>
+      <div className="app-user-menu" ref={menuRef}>
+        <button className="app-user-chip" type="button" onClick={() => setMenuOpen((current) => !current)}>
           <span>{displayName}</span>
-          <span className="workspace-user-avatar" style={{ background: user.color || '#444' }}>
+          <span className="app-user-avatar" style={{ background: user.color || '#444' }}>
             <Avatar avatarUrl={user.avatarUrl} name={displayName} className="avatar-image" />
           </span>
         </button>
 
         {menuOpen ? (
-          <div className="workspace-dropdown">
+          <div className="app-dropdown">
             <button type="button" onClick={() => { setMenuOpen(false); navigate('/profile'); }}>Edit Profile</button>
             <button type="button" onClick={() => { setMenuOpen(false); onLogout(); }}>Log Out</button>
           </div>

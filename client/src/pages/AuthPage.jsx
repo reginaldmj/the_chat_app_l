@@ -29,7 +29,7 @@ export default function AuthPage() {
 
         <div className="auth-copy">
           <h1>{isRegister ? 'Create your account' : 'Welcome back'}</h1>
-          <p>{isRegister ? 'Join your workspace.' : 'Sign in to continue.'}</p>
+          <p>{isRegister ? 'Join the conversation.' : 'Sign in to continue.'}</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

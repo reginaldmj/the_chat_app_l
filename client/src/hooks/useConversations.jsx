@@ -1,5 +1,6 @@
 import React from "react";
 import { convApi, userApi } from "../utils/api";
+import { resizeImageFile } from "../utils/images";
 
 export function getConversationName(conversation, user) {
   if (!conversation) return "Unknown conversation";
@@ -56,6 +57,19 @@ export function groupMessages(messages) {
   }, []);
 }
 
+function uniqueUsers(users, currentUserId) {
+  const seen = new Set();
+
+  return (Array.isArray(users) ? users : []).filter((user) => {
+    if (!user?.id || user.id === currentUserId || seen.has(user.id)) {
+      return false;
+    }
+
+    seen.add(user.id);
+    return true;
+  });
+}
+
 export default function useConversations(user, navigate) {
   const [conversations, setConversations] = React.useState([]);
   const [conversationsLoading, setConversationsLoading] = React.useState(false);
@@ -67,6 +81,7 @@ export default function useConversations(user, navigate) {
   const [sendingMessage, setSendingMessage] = React.useState(false);
   const [modalUsers, setModalUsers] = React.useState([]);
   const [modalLoading, setModalLoading] = React.useState(false);
+  const [modalError, setModalError] = React.useState("");
 
   const loadConversations = React.useCallback(
     async ({ silent = false } = {}) => {
@@ -130,16 +145,22 @@ export default function useConversations(user, navigate) {
     [loadConversations, loadMessages, navigate],
   );
 
-  const openConversationModal = React.useCallback(async () => {
+  const openConversationModal = React.useCallback(async (usersFallback = []) => {
+    const fallbackUsers = uniqueUsers(usersFallback, user?.id);
+
+    setModalError("");
+    setModalUsers(fallbackUsers);
     setModalLoading(true);
     try {
-      setModalUsers(await userApi.list());
-    } catch {
-      setModalUsers([]);
+      const registeredUsers = uniqueUsers(await userApi.list(), user?.id);
+      setModalUsers(uniqueUsers([...fallbackUsers, ...registeredUsers], user?.id));
+    } catch (error) {
+      setModalError(error.message || "Unable to load registered users.");
+      if (fallbackUsers.length === 0) setModalUsers([]);
     } finally {
       setModalLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   const createConversation = React.useCallback(
     async ({ participantIds, name, isGroup }) => {
@@ -186,24 +207,15 @@ export default function useConversations(user, navigate) {
     [conversations],
   );
 
-  function readFileAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
   const prepareAttachment = React.useCallback(async (file) => {
     if (!file) return null;
     if (!file.type?.startsWith("image/")) return null;
-    const dataUrl = await readFileAsDataUrl(file);
+    const resized = await resizeImageFile(file);
     return {
       name: file.name,
-      type: file.type || "application/octet-stream",
-      size: file.size,
-      dataUrl,
+      type: resized.type,
+      size: resized.size,
+      dataUrl: resized.dataUrl,
     };
   }, []);
 
@@ -216,6 +228,7 @@ export default function useConversations(user, navigate) {
     sendingMessage,
     modalUsers,
     modalLoading,
+    modalError,
     unreadTotal,
     loadConversations,
     loadMessages,

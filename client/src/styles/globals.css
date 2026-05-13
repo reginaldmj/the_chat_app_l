@@ -59,13 +59,13 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.workspace-page,
+.app-page,
 .auth-shell,
 .checkpoint-screen {
   position: relative;
 }
 
-.workspace-page::before,
+.app-page::before,
 .auth-shell::before,
 .checkpoint-screen::before {
   content: "RMJ";
@@ -82,7 +82,7 @@ button:disabled {
   user-select: none;
 }
 
-.workspace-page > *,
+.app-page > *,
 .auth-panel,
 .checkpoint-card {
   position: relative;
@@ -127,7 +127,7 @@ button:disabled {
 }
 
 @media (max-width: 900px) {
-  .workspace-page::before,
+  .app-page::before,
   .auth-shell::before,
   .checkpoint-screen::before {
     font-size: 108px;
@@ -135,7 +135,7 @@ button:disabled {
 }
 
 @media (max-width: 640px) {
-  .workspace-page::before,
+  .app-page::before,
   .auth-shell::before,
   .checkpoint-screen::before {
     right: 18px;

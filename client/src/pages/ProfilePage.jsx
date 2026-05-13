@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Avatar from "../components/Avatar.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { clearTokens, userApi } from "../utils/api";
@@ -42,7 +42,7 @@ function getInitialProfile(user) {
 }
 
 function hasProfileChanges(profileForm, user) {
-  if (!user) return false;
+  if (!user || !profileForm) return false;
   const initialProfile = getInitialProfile(user);
 
   return (
@@ -85,33 +85,91 @@ export default function ProfilePage({
   searchQuery = "",
 }) {
   const navigate = useNavigate();
+  const { profileId } = useParams();
   const { setUser } = useAuth();
-
   const fileInputRef = React.useRef(null);
 
+  const [viewedProfile, setViewedProfile] = React.useState(null);
+  const [profileLoading, setProfileLoading] = React.useState(false);
+  const [profileError, setProfileError] = React.useState("");
   const [message, setMessage] = React.useState("");
   const [error, setError] = React.useState("");
   const [saving, setSaving] = React.useState(false);
 
-  const dirty = hasProfileChanges(profileForm, user);
+  const editingOwnProfile = Boolean(user && (!profileId || profileId === user.id));
+  const activeProfile = editingOwnProfile ? user : viewedProfile;
+  const currentProfileForm = editingOwnProfile
+    ? profileForm || getInitialProfile(user)
+    : getInitialProfile(activeProfile);
+  const dirty = editingOwnProfile
+    ? hasProfileChanges(currentProfileForm, user)
+    : false;
   const displayName =
-    profileForm.displayName || user?.displayName || user?.username || "Member";
-  const username = profileForm.username || user?.username || "member";
-  const joinedAt = React.useMemo(() => formatJoinDate(user?.createdAt), [user]);
-  const accountStatus = user?.online ? "Active now" : "Signed in";
-  const sessionStatus = user?.online ? "Online" : "Current session";
+    currentProfileForm.displayName ||
+    activeProfile?.displayName ||
+    activeProfile?.username ||
+    "Member";
+  const username =
+    currentProfileForm.username || activeProfile?.username || "member";
+  const joinedAt = React.useMemo(
+    () => formatJoinDate(activeProfile?.createdAt),
+    [activeProfile?.createdAt],
+  );
+  const accountStatus = activeProfile?.online
+    ? "Active now"
+    : editingOwnProfile
+      ? "Signed in"
+      : "Member profile";
+  const sessionStatus = activeProfile?.online
+    ? "Online"
+    : editingOwnProfile
+      ? "Current session"
+      : "Offline";
   const profileSearch = searchQuery.trim().toLowerCase();
+
+  React.useEffect(() => {
+    let mounted = true;
+
+    if (!profileId || profileId === user?.id) {
+      setViewedProfile(null);
+      setProfileError("");
+      setProfileLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    setProfileLoading(true);
+    setProfileError("");
+
+    userApi.get(profileId)
+      .then((profile) => {
+        if (mounted) setViewedProfile(profile);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setViewedProfile(null);
+        setProfileError(err.message || "Profile not found.");
+      })
+      .finally(() => {
+        if (mounted) setProfileLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [profileId, user?.id]);
 
   const visibleFields = React.useMemo(() => {
     if (!profileSearch) return PROFILE_FIELDS;
 
     return PROFILE_FIELDS.filter((field) => {
-      const value = profileForm[field.key] || "";
+      const value = currentProfileForm[field.key] || "";
       return `${field.label} ${field.key} ${value}`
         .toLowerCase()
         .includes(profileSearch);
     });
-  }, [profileForm, profileSearch]);
+  }, [currentProfileForm, profileSearch]);
 
   const updateProfileField = (key) => (event) => {
     setMessage("");
@@ -132,16 +190,16 @@ export default function ProfilePage({
   const handleSave = async (event) => {
     event.preventDefault();
 
-    if (!user || saving || !dirty) {
+    if (!editingOwnProfile || saving || !dirty) {
       return;
     }
 
     const nextProfile = {
-      displayName: profileForm.displayName.trim(),
-      username: profileForm.username.trim(),
-      email: profileForm.email.trim(),
-      role: profileForm.role.trim(),
-      avatarUrl: profileForm.avatarUrl || "",
+      displayName: currentProfileForm.displayName.trim(),
+      username: currentProfileForm.username.trim(),
+      email: currentProfileForm.email.trim(),
+      role: currentProfileForm.role.trim(),
+      avatarUrl: currentProfileForm.avatarUrl || "",
     };
 
     if (
@@ -221,15 +279,35 @@ export default function ProfilePage({
     event.target.value = "";
   };
 
+  if (!editingOwnProfile && profileLoading) {
+    return (
+      <section className={`profile-page${user ? "" : " public-profile-page"}`}>
+        <div className="status-empty">
+          <span className="mini-spinner"></span>
+        </div>
+      </section>
+    );
+  }
+
+  if (!editingOwnProfile && (!activeProfile || profileError)) {
+    return (
+      <section className={`profile-page${user ? "" : " public-profile-page"}`}>
+        <div className="status-empty">
+          <p>{profileError || "Profile not found."}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="profile-page">
+    <section className={`profile-page${user ? "" : " public-profile-page"}`}>
       <header className="profile-hero">
         <div
           className="profile-hero-avatar"
-          style={{ background: user.color || "#444" }}
+          style={{ background: activeProfile?.color || "#444" }}
         >
           <Avatar
-            avatarUrl={profileForm.avatarUrl}
+            avatarUrl={currentProfileForm.avatarUrl}
             name={displayName}
             className="avatar-image"
           />
@@ -242,7 +320,7 @@ export default function ProfilePage({
           <div className="profile-pill-row">
             <span className="profile-pill">{accountStatus}</span>
             <span className="profile-pill soft">
-              {profileForm.role || "Member"}
+              {currentProfileForm.role || "Member"}
             </span>
           </div>
         </div>
@@ -252,36 +330,47 @@ export default function ProfilePage({
         <aside className="profile-preview-panel">
           <div
             className="profile-preview-avatar"
-            style={{ background: user.color || "#444" }}
+            style={{ background: activeProfile?.color || "#444" }}
           >
             <Avatar
-              avatarUrl={profileForm.avatarUrl}
+              avatarUrl={currentProfileForm.avatarUrl}
               name={displayName}
               className="avatar-image"
             />
           </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={handleAvatarChange}
-          />
+          {editingOwnProfile ? (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleAvatarChange}
+              />
 
-          <button
-            className="profile-upload-btn"
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Upload image
-          </button>
+              <button
+                className="profile-upload-btn"
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Upload image
+              </button>
+            </>
+          ) : null}
 
           <dl className="profile-meta-list">
-            <div>
-              <dt>Email</dt>
-              <dd>{profileForm.email || "Not set"}</dd>
-            </div>
+            {editingOwnProfile ? (
+              <div>
+                <dt>Email</dt>
+                <dd>{currentProfileForm.email || "Not set"}</dd>
+              </div>
+            ) : (
+              <div>
+                <dt>Username</dt>
+                <dd>@{username}</dd>
+              </div>
+            )}
             <div>
               <dt>Member since</dt>
               <dd>{joinedAt}</dd>
@@ -293,74 +382,102 @@ export default function ProfilePage({
           </dl>
         </aside>
 
-        <form className="profile-form-panel" onSubmit={handleSave}>
-          <div className="profile-section-head">
-            <div>
-              <h2>Account details</h2>
-              <p>{dirty ? "Unsaved changes" : "All changes saved"}</p>
+        {editingOwnProfile ? (
+          <form className="profile-form-panel" onSubmit={handleSave}>
+            <div className="profile-section-head">
+              <div>
+                <h2>Account details</h2>
+                <p>{dirty ? "Unsaved changes" : "All changes saved"}</p>
+              </div>
             </div>
-          </div>
 
-          {visibleFields.length === 0 ? (
-            <div className="status-empty">
-              <p>No profile settings match your search.</p>
+            {visibleFields.length === 0 ? (
+              <div className="status-empty">
+                <p>No profile settings match your search.</p>
+              </div>
+            ) : (
+              <div className="profile-fields">
+                {visibleFields.map((field) => (
+                  <label className="profile-field" key={field.key}>
+                    <span>{field.label}</span>
+                    <input
+                      type={field.type}
+                      value={currentProfileForm[field.key]}
+                      autoComplete={field.autoComplete}
+                      onChange={updateProfileField(field.key)}
+                      required
+                    />
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {message ? (
+              <div className="profile-message success">{message}</div>
+            ) : null}
+
+            {error ? <div className="profile-message error">{error}</div> : null}
+
+            <div className="profile-actions">
+              <button
+                className="profile-secondary-btn"
+                type="button"
+                disabled={!dirty || saving}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+              <button
+                className="profile-save-btn"
+                type="submit"
+                disabled={!dirty || saving}
+              >
+                {saving ? "Saving..." : "Save profile"}
+              </button>
             </div>
-          ) : (
-            <div className="profile-fields">
-              {visibleFields.map((field) => (
-                <label className="profile-field" key={field.key}>
-                  <span>{field.label}</span>
-                  <input
-                    type={field.type}
-                    value={profileForm[field.key]}
-                    autoComplete={field.autoComplete}
-                    onChange={updateProfileField(field.key)}
-                    required
-                  />
-                </label>
-              ))}
+          </form>
+        ) : (
+          <section className="profile-form-panel">
+            <div className="profile-section-head">
+              <div>
+                <h2>Profile details</h2>
+                <p>{currentProfileForm.role || "Member"}</p>
+              </div>
             </div>
-          )}
 
-          {message ? (
-            <div className="profile-message success">{message}</div>
-          ) : null}
-
-          {error ? <div className="profile-message error">{error}</div> : null}
-
-          <div className="profile-actions">
-            <button
-              className="profile-secondary-btn"
-              type="button"
-              disabled={!dirty || saving}
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-            <button
-              className="profile-save-btn"
-              type="submit"
-              disabled={!dirty || saving}
-            >
-              {saving ? "Saving..." : "Save profile"}
-            </button>
-          </div>
-        </form>
+            <dl className="profile-meta-list profile-detail-list">
+              <div>
+                <dt>Display name</dt>
+                <dd>{displayName}</dd>
+              </div>
+              <div>
+                <dt>Username</dt>
+                <dd>@{username}</dd>
+              </div>
+              <div>
+                <dt>Role</dt>
+                <dd>{currentProfileForm.role || "Member"}</dd>
+              </div>
+            </dl>
+          </section>
+        )}
       </div>
 
-      <section className="profile-danger">
-        <div>
-          <h2>Account</h2>
-          <p>Deleting removes your user from this workspace.</p>
-        </div>
-        <button
-          className="profile-delete-btn"
-          type="button"
-          onClick={handleDelete}
-        >
-          Delete user
-        </button>
-      </section>
+      {editingOwnProfile ? (
+        <section className="profile-danger">
+          <div>
+            <h2>Account</h2>
+            <p>Deleting removes your user from chat.</p>
+          </div>
+          <button
+            className="profile-delete-btn"
+            type="button"
+            onClick={handleDelete}
+          >
+            Delete user
+          </button>
+        </section>
+      ) : null}
     </section>
   );
 }

@@ -4,6 +4,7 @@ export default function ConversationModal({
   open,
   modalUsers,
   modalLoading,
+  modalError,
   modalSearch,
   setModalSearch,
   modalSelected,
@@ -45,12 +46,18 @@ export default function ConversationModal({
         ) : null}
 
         <div className="modal-user-list">
+          {modalError ? (
+            <div className="modal-error">
+              {modalError}
+            </div>
+          ) : null}
+
           {modalLoading ? <div><span className="mini-spinner"></span></div> : null}
 
           {!modalLoading && filteredUsers.length === 0 ? (
             <div className="modal-empty-state">
-              <strong>{modalSearch.trim() ? 'No users match your search' : 'No other users registered yet'}</strong>
-              <p>{modalSearch.trim() ? 'Try searching by display name or username.' : 'Invite your friends, family or colleagues to join chat'}</p>
+              <strong>{modalError ? 'Unable to load users' : modalSearch.trim() ? 'No users match your search' : 'No other users registered yet'}</strong>
+              <p>{modalError || (modalSearch.trim() ? 'Try searching by display name or username.' : 'Register another account to start a conversation.')}</p>
             </div>
           ) : null}
 

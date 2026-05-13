@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Avatar from '../components/Avatar.jsx';
 
 export default function MembersPage({ searchQuery, members }) {
@@ -28,7 +29,7 @@ export default function MembersPage({ searchQuery, members }) {
       ) : (
         <div className="members-grid">
           {filteredMembers.map((member) => (
-            <article key={member.id} className="member-card">
+            <Link key={member.id} className="member-card" to={`/profile/${member.id}`}>
               <div className="member-avatar" style={{ background: member.color || '#444' }}>
                 <Avatar avatarUrl={member.avatarUrl} name={member.displayName || member.username} className="avatar-image" />
               </div>
@@ -37,7 +38,7 @@ export default function MembersPage({ searchQuery, members }) {
                 <p>@{member.username || 'unknown'}</p>
                 <span>{member.role || 'Member'}</span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       )}

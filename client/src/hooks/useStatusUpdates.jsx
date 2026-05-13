@@ -1,4 +1,5 @@
 import React from 'react';
+import { resizeImageFile } from '../utils/images';
 
 const STORAGE_KEY = 'chat_status_updates';
 
@@ -54,23 +55,18 @@ export default function useStatusUpdates(user) {
     return true;
   }, [user]);
 
-  function readFileAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
   const prepareStatusAttachment = React.useCallback(async (file) => {
     if (!file || !file.type?.startsWith('image/')) return null;
-    const dataUrl = await readFileAsDataUrl(file);
+    const resized = await resizeImageFile(file, {
+      maxEdge: 760,
+      maxBytes: 280 * 1024,
+      quality: 0.68,
+    });
     return {
       name: file.name,
-      type: file.type,
-      size: file.size,
-      dataUrl,
+      type: resized.type,
+      size: resized.size,
+      dataUrl: resized.dataUrl,
     };
   }, []);
 

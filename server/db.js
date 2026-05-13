@@ -1,10 +1,64 @@
 // UUIDs make user ids unique without needing a database sequence.
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Demo storage is process-local; data and token revocation do not survive restarts or scale across instances.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'data.json');
+
 const users = new Map();
 const refreshTokens = new Set();
+const conversations = new Map();
+const messages = new Map();
+
+function loadStore() {
+  try {
+    if (!fs.existsSync(DATA_FILE)) return;
+
+    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+
+    (data.users || []).forEach((user) => {
+      if (user?.id) users.set(user.id, user);
+    });
+
+    (data.refreshTokens || []).forEach((token) => {
+      if (token) refreshTokens.add(token);
+    });
+
+    (data.conversations || []).forEach((conversation) => {
+      if (conversation?.id) conversations.set(conversation.id, conversation);
+    });
+
+    (data.messages || []).forEach(([conversationId, conversationMessages]) => {
+      if (conversationId && Array.isArray(conversationMessages)) {
+        messages.set(conversationId, conversationMessages);
+      }
+    });
+  } catch (error) {
+    console.warn(`Unable to load local data store: ${error.message}`);
+  }
+}
+
+function persistStore() {
+  try {
+    fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+    fs.writeFileSync(
+      DATA_FILE,
+      JSON.stringify({
+        users: [...users.values()],
+        refreshTokens: [...refreshTokens],
+        conversations: [...conversations.values()],
+        messages: [...messages.entries()],
+      }, null, 2),
+    );
+  } catch (error) {
+    console.warn(`Unable to save local data store: ${error.message}`);
+  }
+}
+
+loadStore();
 
 async function createUser({ username, email, password, displayName, role, color }) {
   // Uniqueness checks live beside storage so every auth route gets the same rule.
@@ -34,6 +88,7 @@ async function createUser({ username, email, password, displayName, role, color 
   };
 
   users.set(id, user);
+  persistStore();
   return safeUser(user);
 }
 
@@ -54,17 +109,20 @@ function setUserOnline(id, online) {
   if (user) {
     user.online = online;
     users.set(id, user);
+    persistStore();
   }
 }
-
 function safeUser(user) {
   // API responses must never include passwordHash.
   const { passwordHash, ...safe } = user;
   return safe;
-
 }
 
-const conversations = new Map();
+function publicUser(user) {
+  // Public profiles do not expose login details.
+  const { passwordHash, email, ...profile } = user;
+  return profile;
+}
 
 function createConversation({ participants, name, isGroup }) {
   const id = uuidv4();
@@ -77,6 +135,7 @@ function createConversation({ participants, name, isGroup }) {
     updatedAt: new Date().toISOString(),
   };
   conversations.set(id, conv);
+  persistStore();
   return conv;
 }
 
@@ -102,10 +161,9 @@ function touchConversation(id) {
   if (conversation) {
     conversation.updatedAt = new Date().toISOString();
     conversations.set(id, conversation);
+    persistStore();
   }
 }
-
-const messages = new Map();
 
 function addMessage({ conversationId, senderId, text, attachment = null }) {
   if (!messages.has(conversationId)) messages.set(conversationId, []);
@@ -122,6 +180,7 @@ function addMessage({ conversationId, senderId, text, attachment = null }) {
 
   messages.get(conversationId).push(msg);
   touchConversation(conversationId);
+  persistStore();
   return msg;
 }
 
@@ -135,6 +194,7 @@ function markRead(conversationId, userId) {
   convoMessages.forEach((message) => {
     if (message.senderId !== userId) message.read = true;
   });
+  persistStore();
 }
 
 function unreadCount(conversationId, userId) {
@@ -169,6 +229,7 @@ function updateUser(id, updates = {}) {
   };
 
   users.set(id, nextUser);
+  persistStore();
   return safeUser(nextUser);
 }
 
@@ -176,7 +237,24 @@ function deleteUser(id) {
   const user = users.get(id);
   if (!user) return false;
   users.delete(id);
+  persistStore();
   return true;
+}
+
+function addRefreshToken(token) {
+  if (!token) return;
+  refreshTokens.add(token);
+  persistStore();
+}
+
+function deleteRefreshToken(token) {
+  const deleted = refreshTokens.delete(token);
+  if (deleted) persistStore();
+  return deleted;
+}
+
+function hasRefreshToken(token) {
+  return refreshTokens.has(token);
 }
 
 
@@ -187,12 +265,16 @@ export {
   getAllUsers,
   setUserOnline,
   safeUser,
+  publicUser,
   refreshTokens,
   addMessage,
   getMessages,
   markRead,
   updateUser,
   deleteUser,
+  addRefreshToken,
+  deleteRefreshToken,
+  hasRefreshToken,
 };
 
 export default {
@@ -202,6 +284,7 @@ export default {
   getAllUsers,
   setUserOnline,
   safeUser,
+  publicUser,
   refreshTokens,
   createConversation, 
   getConversation, 
@@ -213,4 +296,7 @@ export default {
   markRead,
   updateUser,
   deleteUser,
+  addRefreshToken,
+  deleteRefreshToken,
+  hasRefreshToken,
 };

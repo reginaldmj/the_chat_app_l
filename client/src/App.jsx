@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import { useAuth } from './contexts/AuthContext.jsx';
 import ActivityPage from './pages/ActivityPage.jsx';
@@ -10,7 +10,6 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import StatusesPage from './pages/StatusesPage.jsx';
 import useMembers from './hooks/useMembers.jsx';
 import useStatusUpdates from './hooks/useStatusUpdates.jsx';
-import { useNavigate } from 'react-router-dom';
 import useConversations from './hooks/useConversations.jsx';
 
 
@@ -58,9 +57,6 @@ export default function App() {
     }
   }, [user]);
 
-  if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
-  if (!user) return <AuthPage />;
-
   const sharedProps = {
     user,
     searchQuery,
@@ -89,6 +85,18 @@ export default function App() {
     profileForm,
     setProfileForm,
   };
+
+  if (authLoading) return <main className="checkpoint-screen"><section className="checkpoint-card">Loading...</section></main>;
+
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/profile/:profileId" element={<ProfilePage {...sharedProps} />} />
+        <Route path="*" element={<AuthPage />} />
+      </Routes>
+    );
+  }
+
   return (
     <Layout {...sharedProps}>
       <Routes>
@@ -97,6 +105,7 @@ export default function App() {
         <Route path="/statuses" element={<StatusesPage {...sharedProps} />} />
         <Route path="/messages" element={<MessagesPage {...sharedProps} />} />
         <Route path="/profile" element={<ProfilePage {...sharedProps} />} />
+        <Route path="/profile/:profileId" element={<ProfilePage {...sharedProps} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

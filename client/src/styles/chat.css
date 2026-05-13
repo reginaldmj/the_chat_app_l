@@ -75,19 +75,21 @@
 
 .msg-bubble {
   display: inline-block;
+  max-width: 100%;
   padding: 9px 13px;
   border-radius: 16px;
   line-height: 1.6;
   word-break: break-word;
+  background: #191970;
+  color: #fff;
 }
 
 .msg-bubble.theirs {
-  background: #ffffff;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .msg-bubble.mine {
-  background: var(--accent);
+  background: #111154;
   color: #fff;
 }
 
@@ -164,13 +166,24 @@
 
 .attachment-card {
   margin-top: 8px;
+  width: min(100%, 320px);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--surface);
 }
 
+.attachment-card.image {
+  position: relative;
+  width: min(100%, 300px);
+}
+
 .msg-bubble.theirs .attachment-card,
+.msg-bubble.mine .attachment-card {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .input-column .attachment-card,
 .status-upload-area .attachment-card,
 .status-post .attachment-card {
@@ -178,16 +191,22 @@
   background: var(--surface-soft);
 }
 
-.msg-bubble.mine .attachment-card {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.14);
+.msg-bubble .attachment-card.image {
+  width: min(100%, 260px);
+}
+
+.input-column .attachment-card.image,
+.status-upload-area .attachment-card.image {
+  width: min(100%, 220px);
 }
 
 .attachment-preview {
   display: block;
   width: 100%;
-  max-height: 260px;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: min(34vh, 240px);
+  object-fit: contain;
+  background: rgba(7, 20, 47, 0.08);
 }
 
 .attachment-copy {
@@ -203,15 +222,6 @@
   display: block;
 }
 
-.attachment-copy a {
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.msg-bubble.mine .attachment-copy a {
-  color: #fff;
-}
-
 .attachment-remove {
   flex: 0 0 auto;
   border: 1px solid var(--border);
@@ -220,6 +230,15 @@
   color: #9d3a58;
   background: #fff8fb;
   font-weight: 700;
+}
+
+.image-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 20px rgba(44, 31, 39, 0.16);
 }
 
 .message-upload-zone {
@@ -319,6 +338,16 @@
   min-height: 132px;
   overflow-y: auto;
   padding: 14px 20px 20px;
+}
+
+.modal-error {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid #efc2c7;
+  border-radius: 14px;
+  background: #fff5f6;
+  color: #a83c45;
+  font-weight: 700;
 }
 
 .modal-empty-state {
@@ -428,6 +457,15 @@
 
   .msg-content {
     max-width: 82%;
+  }
+
+  .attachment-card,
+  .attachment-card.image {
+    width: min(100%, 70vw);
+  }
+
+  .attachment-preview {
+    max-height: min(30vh, 220px);
   }
 
   .modal-overlay {

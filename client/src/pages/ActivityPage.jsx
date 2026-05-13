@@ -59,7 +59,7 @@ export default function ActivityPage({
           </div>
           <div>
             <div className="status-title">{user.displayName || user.username}</div>
-            <div className="status-subtitle">Share a quick update with your workspace.</div>
+            <div className="status-subtitle">Share a quick update with your team.</div>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ export default function ActivityPage({
 
       <header className="feed-heading">
         <h2>Latest updates</h2>
-        <p>Recent status posts from your workspace.</p>
+        <p>Recent status posts from your team.</p>
       </header>
 
       <section className="status-feed">
