@@ -127,13 +127,14 @@ router.post("/:id/messages", (req, res) => {
     conversationId: conv.id,
     senderId: req.user.id,
     text: trimmedText,
+    attachment: normalizedAttachment,
   });
   const sender = db.findUserById(msg.senderId);
 
   res.status(201).json({
     id: msg.id,
     text: msg.text,
-    attachment: null,
+    attachment: msg.attachment || null,
     senderId: msg.senderId,
     senderName: sender ? sender.displayName : "Unknown",
     senderColor: sender ? sender.color : "#888",

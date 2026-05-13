@@ -1,14 +1,48 @@
 import React from 'react';
+import AttachmentCard from '../components/AttachmentCard.jsx';
 import Avatar from '../components/Avatar.jsx';
 import { formatStatusTime } from '../components/format.js';
 import { getFilteredStatusUpdates } from '../hooks/useStatusUpdates.jsx';
 
-export default function ActivityPage({ user, searchQuery, statuses, statusText, setStatusText }) {
+export default function ActivityPage({
+  user,
+  searchQuery,
+  statuses,
+  statusText,
+  setStatusText,
+  statusAttachment,
+  setStatusAttachment,
+}) {
+  const statusFileInputRef = React.useRef(null);
   // Derive filtered data from state instead of storing a second filtered copy.
   const filteredUpdates = React.useMemo(
     () => getFilteredStatusUpdates(statuses.statusUpdates, searchQuery),
     [searchQuery, statuses.statusUpdates],
   );
+
+  const handleChooseStatusImage = () => {
+    statusFileInputRef.current?.click();
+  };
+
+  const handleStatusImageChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const attachment = await statuses.prepareStatusAttachment(file);
+
+    if (attachment) {
+      setStatusAttachment(attachment);
+    }
+
+    event.target.value = '';
+  };
+
+  const handlePostStatus = () => {
+    if (statuses.addStatus(statusText, statusAttachment)) {
+      setStatusText('');
+      setStatusAttachment(null);
+    }
+  };
 
   return (
     <section className="home-page">
@@ -36,16 +70,34 @@ export default function ActivityPage({ user, searchQuery, statuses, statusText, 
           placeholder="What would you like to share?"
         />
 
+        <div className="status-upload-area">
+          <input
+            ref={statusFileInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleStatusImageChange}
+          />
+
+          {statusAttachment ? (
+            <AttachmentCard
+              attachment={statusAttachment}
+              onRemove={() => setStatusAttachment(null)}
+            />
+          ) : (
+            <button className="image-upload-zone" type="button" onClick={handleChooseStatusImage}>
+              Upload image
+            </button>
+          )}
+        </div>
+
         <div className="status-actions">
           <span>{filteredUpdates.length} post{filteredUpdates.length === 1 ? '' : 's'}</span>
           <button
             className="profile-save-btn"
             type="button"
-            disabled={!statusText.trim()}
-            onClick={() => {
-              // addStatus returns false for blank posts or missing users, so only clear on success.
-              if (statuses.addStatus(statusText)) setStatusText('');
-            }}
+            disabled={!statusText.trim() && !statusAttachment}
+            onClick={handlePostStatus}
           >
             Post
           </button>
@@ -73,7 +125,8 @@ export default function ActivityPage({ user, searchQuery, statuses, statusText, 
                 <p>@{update.user?.username || 'unknown'} | {formatStatusTime(update.createdAt)}</p>
               </div>
             </div>
-            <p className="status-post-copy">{update.text}</p>
+            {update.attachment ? <AttachmentCard attachment={update.attachment} /> : null}
+            {update.text ? <p className="status-post-copy">{update.text}</p> : null}
           </article>
         ))}
       </section>

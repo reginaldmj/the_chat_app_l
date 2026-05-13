@@ -21,7 +21,8 @@ export function getFilteredMessages(messages, query) {
   const value = query.trim().toLowerCase();
   if (!value) return messages;
   return messages.filter((message) =>
-    (message.text || "").toLowerCase().includes(value),
+    (message.text || "").toLowerCase().includes(value) ||
+      (message.attachment?.name || "").toLowerCase().includes(value),
   );
 }
 
@@ -153,13 +154,15 @@ export default function useConversations(user, navigate) {
   );
 
   const sendMessage = React.useCallback(
-    async (conversationId, text) => {
+    async (conversationId, text, attachment = null) => {
       const trimmedText = text.trim();
-      if (!conversationId || !trimmedText || sendingMessage) return false;
+      if (!conversationId || (!trimmedText && !attachment) || sendingMessage)
+        return false;
       setSendingMessage(true);
       try {
         const message = await convApi.sendMessage(conversationId, {
           text: trimmedText,
+          attachment,
         });
         setMessagesByConversation((current) => ({
           ...current,
@@ -194,6 +197,7 @@ export default function useConversations(user, navigate) {
 
   const prepareAttachment = React.useCallback(async (file) => {
     if (!file) return null;
+    if (!file.type?.startsWith("image/")) return null;
     const dataUrl = await readFileAsDataUrl(file);
     return {
       name: file.name,
@@ -219,5 +223,6 @@ export default function useConversations(user, navigate) {
     openConversationModal,
     createConversation,
     sendMessage,
+    prepareAttachment,
   };
 }

@@ -70,7 +70,8 @@ app.use((req, res, next) => {
 });
 
 // Parse JSON request bodies for every route that follows.
-app.use(express.json());
+// Image attachments are sent as data URLs in this demo, so allow larger JSON bodies.
+app.use(express.json({ limit: '10mb' }));
 
 // Auth routes must mount before the 404 handler.
 app.use('/api/auth', authRoutes);

@@ -1,4 +1,5 @@
 import React from 'react';
+import AttachmentCard from '../components/AttachmentCard.jsx';
 import Avatar from '../components/Avatar.jsx';
 import { formatStatusTime } from '../components/format.js';
 import { getFilteredStatusUpdates } from '../hooks/useStatusUpdates.jsx';
@@ -32,7 +33,8 @@ export default function StatusesPage({ searchQuery, statuses }) {
                   <p>@{update.user?.username || 'unknown'} | {formatStatusTime(update.createdAt)}</p>
                 </div>
               </div>
-              <p className="status-post-copy">{update.text}</p>
+              {update.attachment ? <AttachmentCard attachment={update.attachment} /> : null}
+              {update.text ? <p className="status-post-copy">{update.text}</p> : null}
             </article>
           ))}
         </section>

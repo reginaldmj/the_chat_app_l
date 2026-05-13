@@ -16,7 +16,8 @@ export function getFilteredStatusUpdates(statusUpdates, query) {
   if (!value) return statusUpdates;
 
   return statusUpdates.filter((update) => (
-    update.text.toLowerCase().includes(value)
+    (update.text || '').toLowerCase().includes(value)
+    || (update.attachment?.name || '').toLowerCase().includes(value)
     || (update.user?.displayName || '').toLowerCase().includes(value)
     || (update.user?.username || '').toLowerCase().includes(value)
   ));
@@ -30,14 +31,15 @@ export default function useStatusUpdates(user) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(statusUpdates));
   }, [statusUpdates]);
 
-  const addStatus = React.useCallback((text) => {
+  const addStatus = React.useCallback((text, attachment = null) => {
     const trimmed = text.trim();
-    if (!trimmed || !user) return false;
+    if ((!trimmed && !attachment) || !user) return false;
 
     setStatusUpdates((current) => [
       {
         id: `${Date.now()}`,
         text: trimmed,
+        attachment,
         createdAt: new Date().toISOString(),
         user: {
           username: user.username,
@@ -52,5 +54,25 @@ export default function useStatusUpdates(user) {
     return true;
   }, [user]);
 
-  return { statusUpdates, addStatus };
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const prepareStatusAttachment = React.useCallback(async (file) => {
+    if (!file || !file.type?.startsWith('image/')) return null;
+    const dataUrl = await readFileAsDataUrl(file);
+    return {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      dataUrl,
+    };
+  }, []);
+
+  return { statusUpdates, addStatus, prepareStatusAttachment };
 }

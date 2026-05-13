@@ -190,16 +190,17 @@ export default function MessagesPage({
         <input
           ref={fileInputRef}
           type="file"
+          accept="image/*"
           hidden
           onChange={handleFileChange}
         />
-
         <button
           type="button"
           className="attach-btn"
           onClick={handleChooseFile}
+          aria-label="Upload image"
         >
-          +
+          Image
         </button>
 
         <div className="input-column">
@@ -208,7 +209,11 @@ export default function MessagesPage({
               attachment={pendingAttachment}
               onRemove={() => setPendingAttachment(null)}
             />
-          ) : null}
+          ) : (
+            <button className="message-upload-zone" type="button" onClick={handleChooseFile}>
+              Add image
+            </button>
+          )}
 
           <input
             value={messageText}

@@ -36,6 +36,8 @@ export default function App() {
   const [modalSelected, setModalSelected] = React.useState([]);
   const [modalGroupName, setModalGroupName] = React.useState('');
   const [messageText, setMessageText] = React.useState('');
+  const [pendingAttachment, setPendingAttachment] = React.useState(null);
+  const [statusAttachment, setStatusAttachment] = React.useState(null);
   const [profileForm, setProfileForm] = React.useState({
     displayName: '',
     username: '',
@@ -80,6 +82,10 @@ export default function App() {
     setModalGroupName,
     messageText,
     setMessageText,
+    pendingAttachment,
+    setPendingAttachment,
+    statusAttachment,
+    setStatusAttachment,
     profileForm,
     setProfileForm,
   };

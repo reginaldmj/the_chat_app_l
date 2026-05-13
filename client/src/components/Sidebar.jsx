@@ -20,6 +20,7 @@ export default function Sidebar({
     { label: 'Members', path: '/members', icon: 'M' },
     { label: 'Statuses', path: '/statuses', icon: 'S' },
     { label: 'Messages', path: '/messages', icon: 'C' },
+    { label: 'Profile', path: '/profile', icon: 'P' },
   ];
   const filteredConversations = React.useMemo(() => {
     const query = conversationSearch.trim().toLowerCase();
